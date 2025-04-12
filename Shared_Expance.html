@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Shared Expenses</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Shared Expenses Styles */
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .shared-expenses-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .expense-groups {
+      padding: 1.5rem;
+    }
+
+    .expense-group {
+      border: 1px solid var(--medium-gray);
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .expense-group-header {
+      background-color: var(--light-gray);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .expense-group-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .expense-group-meta {
+      display: flex;
+      gap: 1rem;
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+
+    .expense-group-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .expense-group-body {
+      padding: 1.5rem;
+    }
+
+    .expense-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .expense-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+      color: var(--dark-gray);
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .expense-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--medium-gray);
+      vertical-align: middle;
+    }
+
+    .expense-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .expense-amount {
+      font-weight: 600;
+    }
+
+    .expense-paid-by {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-avatar-small {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .expense-status {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-settled {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pending {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+
+    .expense-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dark-gray);
+    }
+
+    .action-btn:hover {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .settle-up-section {
+      padding: 1.5rem;
+      border-top: 1px solid var(--medium-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .settle-up-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .settle-up-amount {
+      font-weight: 600;
+    }
+
+    .settle-up-details {
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+
+    .empty-state {
+      padding: 3rem;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--medium-gray);
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 0.5rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--dark-gray);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 0.375rem;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+    }
+
+    .split-members {
+      margin-top: 1rem;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    .member-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .member-share {
+      width: 100px;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--medium-gray);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--medium-gray);
+      color: var(--text-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--light-gray);
+    }
+
+    /* Quick Add */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .expense-group-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .expense-group-meta {
+        flex-wrap: wrap;
+      }
+      .expense-table {
+        display: block;
+        overflow-x: auto;
+      }
+      .settle-up-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .quick-add {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="expense-tracker.html" class="nav-link">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Budget</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="shared-expenses.html" class="nav-link active">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Shared Expenses</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <!-- Shared Expenses Content -->
+      <div class="shared-expenses-container">
+        <div class="expense-groups">
+          <div class="expense-group">
+            <div class="expense-group-header">
+              <div class="expense-group-title">Roommates</div>
+              <div class="expense-group-meta">
+                <span><i class="fas fa-users"></i> 4 members</span>
+                <span><i class="fas fa-receipt"></i> 12 expenses</span>
+                <span><i class="fas fa-clock"></i> Updated 2 days ago</span>
+              </div>
+            </div>
+            <div class="expense-group-body">
+              <table class="expense-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Paid by</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Groceries</td>
+                    <td class="expense-amount">₹1,250.00</td>
+                    <td>
+                      <div class="expense-paid-by">
+                        <div class="user-avatar-small">JS</div>
+                        You
+                      </div>
+                    </td>
+                    <td>12 Jan 2024</td>
+                    <td><span class="expense-status status-pending">Pending</span></td>
+                    <td>
+                      <div class="expense-actions">
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Internet Bill</td>
+                    <td class="expense-amount">₹1,800.00</td>
+                    <td>
+                      <div class="expense-paid-by">
+                        <div class="user-avatar-small">AK</div>
+                        Alex
+                      </div>
+                    </td>
+                    <td>5 Jan 2024</td>
+                    <td><span class="expense-status status-settled">Settled</span></td>
+                    <td>
+                      <div class="expense-actions">
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Electricity Bill</td>
+                    <td class="expense-amount">₹2,400.00</td>
+                    <td>
+                      <div class="expense-paid-by">
+                        <div class="user-avatar-small">SM</div>
+                        Sam
+                      </div>
+                    </td>
+                    <td>3 Jan 2024</td>
+                    <td><span class="expense-status status-pending">Pending</span></td>
+                    <td>
+                      <div class="expense-actions">
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="settle-up-section">
+              <div class="settle-up-info">
+                <div class="user-avatar-small">AK</div>
+                <div>
+                  <div>You owe <span class="settle-up-amount">₹850.00</span></div>
+                  <div class="settle-up-details">to Alex for 2 expenses</div>
+                </div>
+              </div>
+              <button class="btn btn-primary">
+                <i class="fas fa-exchange-alt"></i> Settle Up
+              </button>
+            </div>
+          </div>
+
+          <div class="expense-group">
+            <div class="expense-group-header">
+              <div class="expense-group-title">Trip to Goa</div>
+              <div class="expense-group-meta">
+                <span><i class="fas fa-users"></i> 6 members</span>
+                <span><i class="fas fa-receipt"></i> 8 expenses</span>
+                <span><i class="fas fa-clock"></i> Updated 1 week ago</span>
+              </div>
+            </div>
+            <div class="expense-group-body">
+              <table class="expense-table">
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Paid by</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Hotel Booking</td>
+                    <td class="expense-amount">₹12,000.00</td>
+                    <td>
+                      <div class="expense-paid-by">
+                        <div class="user-avatar-small">JS</div>
+                        You
+                      </div>
+                    </td>
+                    <td>28 Dec 2023</td>
+                    <td><span class="expense-status status-pending">Pending</span></td>
+                    <td>
+                      <div class="expense-actions">
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Flight Tickets</td>
+                    <td class="expense-amount">₹24,500.00</td>
+                    <td>
+                      <div class="expense-paid-by">
+                        <div class="user-avatar-small">PR</div>
+                        Priya
+                      </div>
+                    </td>
+                    <td>22 Dec 2023</td>
+                    <td><span class="expense-status status-pending">Pending</span></td>
+                    <td>
+                      <div class="expense-actions">
+                        <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn"><i class="fas fa-trash"></i></button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="settle-up-section">
+              <div class="settle-up-info">
+                <div class="user-avatar-small">JS</div>
+                <div>
+                  <div>You are owed <span class="settle-up-amount">₹2,000.00</span></div>
+                  <div class="settle-up-details">from 3 members</div>
+                </div>
+              </div>
+              <button class="btn btn-primary">
+                <i class="fas fa-exchange-alt"></i> Request Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Add Button -->
+      <div class="quick-add">
+        <button class="add-btn" id="newGroupBtn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Group Modal -->
+  <div class="modal" id="newGroupModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Create New Group</div>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Group Name</label>
+          <input type="text" class="form-control" placeholder="e.g. Roommates, Trip to Goa">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Currency</label>
+          <select class="form-control form-select">
+            <option>Indian Rupee (₹)</option>
+            <option>US Dollar ($)</option>
+            <option>Euro (€)</option>
+            <option>British Pound (£)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Add Members</label>
+          <input type="text" class="form-control" placeholder="Enter email addresses separated by commas">
+        </div>
+        <div class="form-group">
+          <label class="form-label">How to split expenses</label>
+          <select class="form-control form-select">
+            <option>Equally</option>
+            <option>By percentage</option>
+            <option>By shares</option>
+            <option>By exact amounts</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelModal">Cancel</button>
+        <button class="btn btn-primary">Create Group</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Modal functionality
+    const newGroupBtn = document.getElementById('newGroupBtn');
+    const newGroupModal = document.getElementById('newGroupModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelModal = document.getElementById('cancelModal');
+
+    newGroupBtn.addEventListener('click', () => {
+      newGroupModal.classList.add('active');
+    });
+
+    closeModal.addEventListener('click', () => {
+      newGroupModal.classList.remove('active');
+    });
+
+    cancelModal.addEventListener('click', () => {
+      newGroupModal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+      if (e.target === newGroupModal) {
+        newGroupModal.classList.remove('active');
+      }
+    });
+
+    // Example functionality for expense actions
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('fa-edit')) {
+          alert('Edit expense clicked');
+        } else if (icon.classList.contains('fa-trash')) {
+          if (confirm('Are you sure you want to delete this expense?')) {
+            btn.closest('tr').remove();
+          }
+        }
+      });
+    });
+
+    // Settle up button functionality
+    document.querySelectorAll('.settle-up-section .btn-primary').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amount = btn.closest('.settle-up-section').querySelector('.settle-up-amount').textContent;
+        const action = btn.textContent.includes('Request') ? 'request payment' : 'settle up';
+        alert(`Preparing to ${action} for ${amount}`);
+      });
+    });
+  </script>
+</body>
+</html>
