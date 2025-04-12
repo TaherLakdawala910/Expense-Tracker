@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Reminders</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Reminders Content */
+    .reminder-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .filter-select {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      background-color: white;
+    }
+
+    .add-reminder-btn {
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .add-reminder-btn i {
+      margin-right: 0.5rem;
+    }
+
+    .reminder-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .reminder-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .reminder-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .reminder-checkbox {
+      margin-right: 1rem;
+    }
+
+    .reminder-content {
+      flex: 1;
+    }
+
+    .reminder-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .reminder-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--dark-gray);
+    }
+
+    .reminder-date {
+      display: flex;
+      align-items: center;
+    }
+
+    .reminder-date i {
+      margin-right: 0.3rem;
+      font-size: 0.7rem;
+    }
+
+    .reminder-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+
+    .action-btn:hover {
+      color: var(--primary-color);
+    }
+
+    .reminder-card.completed {
+      opacity: 0.7;
+      background-color: var(--light-gray);
+    }
+
+    .reminder-card.completed .reminder-title {
+      text-decoration: line-through;
+    }
+
+    .upcoming-section, .completed-section {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 0.5rem;
+    }
+
+    /* Quick Add */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+      
+      .reminder-actions {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .filter-group {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="expense-tracking.html" class="nav-link">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="income-management.html" class="nav-link">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Income</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="budget-savings.html" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Budget</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reports.html" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reminders.html" class="nav-link active">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="shared-expenses.html" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="settings.html" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Reminders</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <div class="reminder-actions">
+        <div class="filter-group">
+          <select class="filter-select">
+            <option>All Categories</option>
+            <option>Bills</option>
+            <option>Subscriptions</option>
+            <option>Payments</option>
+          </select>
+          <select class="filter-select">
+            <option>Upcoming</option>
+            <option>Completed</option>
+            <option>All</option>
+          </select>
+        </div>
+        <button class="add-reminder-btn" id="addReminderBtn">
+          <i class="fas fa-plus"></i>
+          <span>Add Reminder</span>
+        </button>
+      </div>
+
+      <div class="upcoming-section">
+        <h2 class="section-title">
+          <i class="fas fa-clock"></i>
+          <span>Upcoming Reminders</span>
+        </h2>
+        <div class="reminder-cards">
+          <div class="reminder-card">
+            <div class="reminder-checkbox">
+              <input type="checkbox" id="reminder1">
+            </div>
+            <div class="reminder-content">
+              <h3 class="reminder-title">Pay electricity bill</h3>
+              <div class="reminder-meta">
+                <div class="reminder-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Due May 20, 2024</span>
+                </div>
+                <div class="reminder-category">Bills</div>
+                <div class="reminder-amount">₹850</div>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="reminder-card">
+            <div class="reminder-checkbox">
+              <input type="checkbox" id="reminder2">
+            </div>
+            <div class="reminder-content">
+              <h3 class="reminder-title">Netflix subscription</h3>
+              <div class="reminder-meta">
+                <div class="reminder-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Due May 25, 2024</span>
+                </div>
+                <div class="reminder-category">Subscriptions</div>
+                <div class="reminder-amount">₹649</div>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="reminder-card">
+            <div class="reminder-checkbox">
+              <input type="checkbox" id="reminder3">
+            </div>
+            <div class="reminder-content">
+              <h3 class="reminder-title">Credit card payment</h3>
+              <div class="reminder-meta">
+                <div class="reminder-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Due June 1, 2024</span>
+                </div>
+                <div class="reminder-category">Payments</div>
+                <div class="reminder-amount">₹12,500</div>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="completed-section">
+        <h2 class="section-title">
+          <i class="fas fa-check-circle"></i>
+          <span>Completed Reminders</span>
+        </h2>
+        <div class="reminder-cards">
+          <div class="reminder-card completed">
+            <div class="reminder-checkbox">
+              <input type="checkbox" id="reminder4" checked>
+            </div>
+            <div class="reminder-content">
+              <h3 class="reminder-title">Rent payment</h3>
+              <div class="reminder-meta">
+                <div class="reminder-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Due May 1, 2024</span>
+                </div>
+                <div class="reminder-category">Housing</div>
+                <div class="reminder-amount">₹15,000</div>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="reminder-card completed">
+            <div class="reminder-checkbox">
+              <input type="checkbox" id="reminder5" checked>
+            </div>
+            <div class="reminder-content">
+              <h3 class="reminder-title">Internet bill</h3>
+              <div class="reminder-meta">
+                <div class="reminder-date">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>Due May 5, 2024</span>
+                </div>
+                <div class="reminder-category">Bills</div>
+                <div class="reminder-amount">₹800</div>
+              </div>
+            </div>
+            <div class="reminder-actions">
+              <button class="action-btn"><i class="fas fa-edit"></i></button>
+              <button class="action-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Add Button -->
+      <div class="quick-add">
+        <button class="add-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Reminders page loaded');
+      
+      // Handle checkbox changes
+      document.querySelectorAll('.reminder-checkbox input').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const card = this.closest('.reminder-card');
+          if (this.checked) {
+            card.classList.add('completed');
+          } else {
+            card.classList.remove('completed');
+          }
+        });
+      });
+
+      // Add reminder button click handler
+      document.getElementById('addReminderBtn').addEventListener('click', function() {
+        // In a real app, this would show a modal to add a new reminder
+        console.log('Add reminder button clicked');
+      });
+    });
+  </script>
+</body>
+</html>
