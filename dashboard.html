@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Dashboard</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Dashboard Widgets */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1.25rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--dark-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-actions {
+      display: flex;
+    }
+
+    .card-actions button {
+      background: none;
+      border: none;
+      color: var(--dark-gray);
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    /* Balance Summary */
+    .balance-summary {
+      grid-column: span 4;
+    }
+
+    .balance-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .balance-change {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--success-color);
+    }
+
+    .balance-change.negative {
+      color: var(--error-color);
+    }
+
+    .balance-change i {
+      margin-right: 0.3rem;
+    }
+
+    /* Budget Status */
+    .budget-status {
+      grid-column: span 4;
+    }
+
+    .budget-progress {
+      height: 8px;
+      background-color: var(--medium-gray);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--success-color);
+      border-radius: 4px;
+      width: 65%;
+    }
+
+    .progress-bar.warning {
+      background-color: var(--warning-color);
+    }
+
+    .progress-bar.danger {
+      background-color: var(--error-color);
+    }
+
+    .budget-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    /* Recent Expenses */
+    .recent-expenses {
+      grid-column: span 4;
+    }
+
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .expense-item:last-child {
+      border-bottom: none;
+    }
+
+    .expense-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .expense-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .expense-details h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .expense-details p {
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+    }
+
+    .expense-amount {
+      font-weight: 600;
+    }
+
+    /* Spending Overview */
+    .spending-overview {
+      grid-column: span 8;
+      min-height: 300px;
+    }
+
+    .chart-placeholder {
+      background-color: var(--light-gray);
+      border-radius: 0.25rem;
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--dark-gray);
+    }
+
+    /* Smart Reminders */
+    .smart-reminders {
+      grid-column: span 4;
+    }
+
+    .reminder-item {
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .reminder-item:last-child {
+      border-bottom: none;
+    }
+
+    .reminder-message {
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .reminder-meta {
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+      display: flex;
+      align-items: center;
+    }
+
+    .reminder-meta i {
+      margin-right: 0.3rem;
+    }
+
+    .reminder-actions {
+      display: flex;
+      margin-top: 0.5rem;
+    }
+
+    .reminder-actions button {
+      background: none;
+      border: none;
+      font-size: 0.7rem;
+      color: var(--primary-color);
+      margin-right: 1rem;
+      cursor: pointer;
+    }
+
+    /* Expense Memory */
+    .expense-memory {
+      grid-column: span 12;
+    }
+
+    .memory-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .memory-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .memory-date {
+      font-size: 0.85rem;
+      color: var(--dark-gray);
+    }
+
+    .memory-card {
+      background-color: var(--light-gray);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .memory-message {
+      font-size: 0.9rem;
+    }
+
+    .memory-details {
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+      margin-top: 0.3rem;
+    }
+
+    /* Quick Add */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .balance-summary, .budget-status, .recent-expenses {
+        grid-column: span 3;
+      }
+      .spending-overview {
+        grid-column: span 6;
+      }
+      .smart-reminders {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .balance-summary, .budget-status, .recent-expenses,
+      .spending-overview, .smart-reminders {
+        grid-column: span 1;
+      }
+      .quick-add {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="#" class="nav-link active">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="expense-tracker.html" class="nav-link">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="saving.html" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Budget & Savings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="income.html" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Income Management</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- Balance Summary -->
+        <div class="card balance-summary">
+          <div class="card-header">
+            <h2 class="card-title">Available Balance</h2>
+          </div>
+          <div class="balance-amount">₹24,850</div>
+          <div class="balance-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>₹2,150 (12%) from last month</span>
+          </div>
+        </div>
+
+        <!-- Budget Status -->
+        <div class="card budget-status">
+          <div class="card-header">
+            <h2 class="card-title">Monthly Budget</h2>
+            <div class="card-actions">
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="budget-progress">
+            <div class="progress-bar warning" style="width: 78%"></div>
+          </div>
+          <div class="budget-details">
+            <span>₹15,600 spent</span>
+            <span>₹20,000 limit</span>
+          </div>
+          <div class="budget-details">
+            <span>₹4,400 remaining</span>
+            <span>₹2,200/day suggested</span>
+          </div>
+        </div>
+
+        <!-- Recent Expenses -->
+        <div class="card recent-expenses">
+          <div class="card-header">
+            <h2 class="card-title">Recent Expenses</h2>
+            <div class="card-actions">
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="expense-item">
+            <div class="expense-info">
+              <div class="expense-icon">
+                <i class="fas fa-utensils"></i>
+              </div>
+              <div class="expense-details">
+                <h4>Dinner at Domino's</h4>
+                <p>Yesterday • Food</p>
+              </div>
+            </div>
+            <div class="expense-amount">-₹350</div>
+          </div>
+          <div class="expense-item">
+            <div class="expense-info">
+              <div class="expense-icon">
+                <i class="fas fa-gas-pump"></i>
+              </div>
+              <div class="expense-details">
+                <h4>Petrol</h4>
+                <p>Apr 10 • Transport</p>
+              </div>
+            </div>
+            <div class="expense-amount">-₹500</div>
+          </div>
+          <div class="expense-item">
+            <div class="expense-info">
+              <div class="expense-icon">
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <div class="expense-details">
+                <h4>Amazon Purchase</h4>
+                <p>Apr 9 • Shopping</p>
+              </div>
+            </div>
+            <div class="expense-amount">-₹1,250</div>
+          </div>
+        </div>
+
+        <!-- Spending Overview -->
+        <div class="card spending-overview">
+          <div class="card-header">
+            <h2 class="card-title">Spending Overview</h2>
+            <div class="card-actions">
+              <button>Week</button>
+              <button>Month</button>
+              <button>Year</button>
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="chart-placeholder">
+            [Spending Chart Would Appear Here]
+          </div>
+        </div>
+
+        <!-- Smart Reminders -->
+        <div class="card smart-reminders">
+          <div class="card-header">
+            <h2 class="card-title">Smart Reminders</h2>
+            <div class="card-actions">
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="reminder-item">
+            <p class="reminder-message">You usually spend ₹200 on Sundays. Today is Sunday.</p>
+            <div class="reminder-meta">
+              <i class="fas fa-clock"></i>
+              <span>Today • Habit</span>
+            </div>
+            <div class="reminder-actions">
+              <button>Set Budget Limit</button>
+              <button>Dismiss</button>
+            </div>
+          </div>
+          <div class="reminder-item">
+            <p class="reminder-message">Internet bill payment due in 2 days (₹800)</p>
+            <div class="reminder-meta">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Apr 15 • Bill</span>
+            </div>
+            <div class="reminder-actions">
+              <button>Pay Now</button>
+              <button>Remind Later</button>
+            </div>
+          </div>
+          <div class="reminder-item">
+            <p class="reminder-message">You've spent ₹700 on food this week (usual: ₹500)</p>
+            <div class="reminder-meta">
+              <i class="fas fa-chart-line"></i>
+              <span>Weekly Summary</span>
+            </div>
+            <div class="reminder-actions">
+              <button>View Details</button>
+              <button>Dismiss</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expense Memory -->
+        <div class="card expense-memory">
+          <div class="memory-header">
+            <h2 class="memory-title">Expense Memory</h2>
+            <div class="memory-date">April 2024</div>
+          </div>
+          <div class="memory-card">
+            <p class="memory-message">Last Friday at 8PM, you spent ₹350 on dinner at Domino's, Nadiad.</p>
+            <p class="memory-details">April 5 • Food • #friends</p>
+          </div>
+          <div class="memory-card">
+            <p class="memory-message">On this day last month, you spent ₹1,200 at Amazon for electronics.</p>
+            <p class="memory-details">March 11 • Shopping • #gadgets</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Add Button -->
+      <div class="quick-add">
+        <button class="add-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // In a real app, this would fetch data from your backend API
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Dashboard loaded');
+      
+      // Example of dynamic content loading
+      // fetch('/api/dashboard-data')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     // Update the UI with real data
+      //   });
+    });
+  </script>
+</body>
+</html>

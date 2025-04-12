@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Track Expenses</title>
+  <!-- Same styles as dashboard -->
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Expense Tracking Specific Styles */
+    .expense-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .expense-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: none;
+      border: 1px solid var(--medium-gray);
+      color: var(--text-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--light-gray);
+    }
+
+    .expense-filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+      color: var(--dark-gray);
+    }
+
+    .filter-select {
+      padding: 0.5rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      min-width: 120px;
+    }
+
+    .expense-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .expense-table th {
+      background-color: var(--light-gray);
+      text-align: left;
+      padding: 0.8rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--dark-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .expense-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--medium-gray);
+      font-size: 0.85rem;
+    }
+
+    .expense-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .expense-category {
+      display: flex;
+      align-items: center;
+    }
+
+    .category-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .expense-amount {
+      font-weight: 600;
+    }
+
+    .expense-amount.income {
+      color: var(--success-color);
+    }
+
+    .expense-amount.expense {
+      color: var(--error-color);
+    }
+
+    .expense-actions-cell {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: var(--dark-gray);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .action-btn:hover {
+      color: var(--primary-color);
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+      gap: 0.5rem;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 1px solid var(--medium-gray);
+      cursor: pointer;
+    }
+
+    .page-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Quick Add (Same as dashboard) */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .expense-filters {
+        flex-direction: column;
+      }
+      .expense-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar (Same as dashboard but with Transactions active) -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link active">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="saving.html" class="nav-link">
+            <i class="fas fa-chart-bar"></i>
+            <span>Budget & Savings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="income.html" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Income Management</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reminders.html" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="shared.html" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="settings.html" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content - Expense Tracking -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Transaction History</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <div class="expense-header">
+        <div class="expense-filters">
+          <div class="filter-group">
+            <label class="filter-label">Date Range</label>
+            <select class="filter-select">
+              <option>Last 30 days</option>
+              <option>This month</option>
+              <option>Last month</option>
+              <option>Custom range</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Category</label>
+            <select class="filter-select">
+              <option>All Categories</option>
+              <option>Food</option>
+              <option>Transport</option>
+              <option>Shopping</option>
+              <option>Bills</option>
+              <option>Entertainment</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label class="filter-label">Type</label>
+            <select class="filter-select">
+              <option>All Transactions</option>
+              <option>Expenses</option>
+              <option>Income</option>
+            </select>
+          </div>
+        </div>
+        <div class="expense-actions">
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Transaction
+          </button>
+          <button class="btn btn-outline">
+            <i class="fas fa-download"></i> Export
+          </button>
+        </div>
+      </div>
+
+      <table class="expense-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Location</th>
+            <th>Amount</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apr 12, 2024</td>
+            <td>
+              <div class="expense-category">
+                <div class="category-icon">
+                  <i class="fas fa-utensils"></i>
+                </div>
+                <div>Dinner at Domino's</div>
+              </div>
+            </td>
+            <td>Food</td>
+            <td>Domino's, Nadiad</td>
+            <td class="expense-amount expense">-₹350</td>
+            <td>
+              <div class="expense-actions-cell">
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Apr 10, 2024</td>
+            <td>
+              <div class="expense-category">
+                <div class="category-icon">
+                  <i class="fas fa-gas-pump"></i>
+                </div>
+                <div>Petrol</div>
+              </div>
+            </td>
+            <td>Transport</td>
+            <td>Shell, Ahmedabad</td>
+            <td class="expense-amount expense">-₹500</td>
+            <td>
+              <div class="expense-actions-cell">
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Apr 9, 2024</td>
+            <td>
+              <div class="expense-category">
+                <div class="category-icon">
+                  <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div>Amazon Purchase</div>
+              </div>
+            </td>
+            <td>Shopping</td>
+            <td>Amazon Online</td>
+            <td class="expense-amount expense">-₹1,250</td>
+            <td>
+              <div class="expense-actions-cell">
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Apr 5, 2024</td>
+            <td>
+              <div class="expense-category">
+                <div class="category-icon">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div>Freelance Payment</div>
+              </div>
+            </td>
+            <td>Income</td>
+            <td>Client XYZ</td>
+            <td class="expense-amount income">+₹5,000</td>
+            <td>
+              <div class="expense-actions-cell">
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Apr 1, 2024</td>
+            <td>
+              <div class="expense-category">
+                <div class="category-icon">
+                  <i class="fas fa-home"></i>
+                </div>
+                <div>Rent Payment</div>
+              </div>
+            </td>
+            <td>Housing</td>
+            <td>Landlord</td>
+            <td class="expense-amount expense">-₹8,000</td>
+            <td>
+              <div class="expense-actions-cell">
+                <button class="action-btn" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <!-- Quick Add Button (Same as dashboard) -->
+      <div class="quick-add">
+        <button class="add-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Expense Tracking page loaded');
+      
+      // Example of dynamic content loading
+      // fetch('/api/expenses')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     // Update the table with real data
+      //   });
+    });
+  </script>
+</body>
+</html>

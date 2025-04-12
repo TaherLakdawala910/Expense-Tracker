@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Budget & Savings</title>
+  <!-- Same styles as dashboard -->
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Budget & Savings Specific Styles */
+    .budget-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .budget-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: none;
+      border: 1px solid var(--medium-gray);
+      color: var(--text-color);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--light-gray);
+    }
+
+    .budget-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .budget-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1.25rem;
+    }
+
+    .budget-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .budget-card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--dark-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .budget-card-actions {
+      display: flex;
+    }
+
+    .budget-card-actions button {
+      background: none;
+      border: none;
+      color: var(--dark-gray);
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+
+    .budget-overview {
+      grid-column: span 8;
+    }
+
+    .budget-categories {
+      grid-column: span 4;
+    }
+
+    .budget-progress {
+      height: 8px;
+      background-color: var(--medium-gray);
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background-color: var(--success-color);
+      border-radius: 4px;
+    }
+
+    .progress-bar.warning {
+      background-color: var(--warning-color);
+    }
+
+    .progress-bar.danger {
+      background-color: var(--error-color);
+    }
+
+    .budget-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .budget-category {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .budget-category:last-child {
+      border-bottom: none;
+    }
+
+    .category-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .category-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .category-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .category-amount {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .category-progress {
+      width: 100%;
+      height: 4px;
+      background-color: var(--medium-gray);
+      border-radius: 2px;
+      margin-top: 0.3rem;
+      overflow: hidden;
+    }
+
+    .category-progress-bar {
+      height: 100%;
+      background-color: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    /* Savings Section */
+    .savings-card {
+      grid-column: span 12;
+    }
+
+    .savings-goals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .goal-card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+    }
+
+    .goal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .goal-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .goal-amount {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .goal-progress {
+      height: 6px;
+      background-color: var(--medium-gray);
+      border-radius: 3px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+
+    .goal-progress-bar {
+      height: 100%;
+      background-color: var(--success-color);
+      border-radius: 3px;
+    }
+
+    .goal-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+    }
+
+    /* Quick Add (Same as dashboard) */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+      .budget-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .budget-overview {
+        grid-column: span 6;
+      }
+      .budget-categories {
+        grid-column: span 6;
+      }
+      .savings-goals {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .budget-grid {
+        grid-template-columns: 1fr;
+      }
+      .budget-overview, .budget-categories {
+        grid-column: span 1;
+      }
+      .savings-goals {
+        grid-template-columns: 1fr;
+      }
+      .quick-add {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Updated Sidebar with renamed items -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="expenses.html" class="nav-link">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="budget-savings.html" class="nav-link active">
+            <i class="fas fa-chart-bar"></i>
+            <span>Budget & Savings</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="income.html" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Income Management</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reminders.html" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="shared.html" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="settings.html" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content - Budget & Savings -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Budget & Savings</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <div class="budget-header">
+        <div>
+          <h2 style="font-size: 1.1rem; margin-bottom: 0.5rem;">April 2024 Budget</h2>
+          <p style="font-size: 0.85rem; color: var(--dark-gray);">Track your spending against your budget goals</p>
+        </div>
+        <div class="budget-actions">
+          <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Budget
+          </button>
+          <button class="btn btn-outline">
+            <i class="fas fa-cog"></i> Settings
+          </button>
+        </div>
+      </div>
+
+      <div class="budget-grid">
+        <!-- Budget Overview -->
+        <div class="budget-card budget-overview">
+          <div class="budget-card-header">
+            <h2 class="budget-card-title">Monthly Budget Overview</h2>
+            <div class="budget-card-actions">
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="budget-progress">
+            <div class="progress-bar warning" style="width: 78%"></div>
+          </div>
+          <div class="budget-details">
+            <span>₹15,600 spent</span>
+            <span>₹20,000 limit</span>
+          </div>
+          <div class="budget-details">
+            <span>₹4,400 remaining</span>
+            <span>₹2,200/day suggested</span>
+          </div>
+          <div class="chart-placeholder" style="height: 200px; margin-top: 1rem;">
+            [Budget vs Actual Spending Chart]
+          </div>
+        </div>
+
+        <!-- Budget Categories -->
+        <div class="budget-card budget-categories">
+          <div class="budget-card-header">
+            <h2 class="budget-card-title">Budget by Category</h2>
+            <div class="budget-card-actions">
+              <button><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+          </div>
+          <div class="budget-category">
+            <div class="category-info">
+              <div class="category-icon">
+                <i class="fas fa-utensils"></i>
+              </div>
+              <div>
+                <div class="category-name">Food</div>
+                <div class="category-progress">
+                  <div class="category-progress-bar" style="width: 85%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="category-amount">₹4,250/₹5,000</div>
+          </div>
+          <div class="budget-category">
+            <div class="category-info">
+              <div class="category-icon">
+                <i class="fas fa-home"></i>
+              </div>
+              <div>
+                <div class="category-name">Housing</div>
+                <div class="category-progress">
+                  <div class="category-progress-bar" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="category-amount">₹8,000/₹8,000</div>
+          </div>
+          <div class="budget-category">
+            <div class="category-info">
+              <div class="category-icon">
+                <i class="fas fa-gas-pump"></i>
+              </div>
+              <div>
+                <div class="category-name">Transport</div>
+                <div class="category-progress">
+                  <div class="category-progress-bar" style="width: 60%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="category-amount">₹1,200/₹2,000</div>
+          </div>
+          <div class="budget-category">
+            <div class="category-info">
+              <div class="category-icon">
+                <i class="fas fa-shopping-bag"></i>
+              </div>
+              <div>
+                <div class="category-name">Shopping</div>
+                <div class="category-progress">
+                  <div class="category-progress-bar warning" style="width: 75%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="category-amount">₹1,500/₹2,000</div>
+          </div>
+        </div>
+
+        <!-- Savings Goals -->
+        <div class="budget-card savings-card">
+          <div class="budget-card-header">
+            <h2 class="budget-card-title">Savings Goals</h2>
+            <div class="budget-card-actions">
+              <button><i class="fas fa-plus"></i> Add Goal</button>
+            </div>
+          </div>
+          <div class="savings-goals">
+            <div class="goal-card">
+              <div class="goal-header">
+                <div class="goal-title">Emergency Fund</div>
+                <i class="fas fa-shield-alt" style="color: var(--primary-color);"></i>
+              </div>
+              <div class="goal-amount">₹12,500/₹50,000</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar" style="width: 25%"></div>
+              </div>
+              <div class="goal-details">
+                <span>25% completed</span>
+                <span>₹37,500 remaining</span>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-header">
+                <div class="goal-title">Vacation</div>
+                <i class="fas fa-umbrella-beach" style="color: var(--warning-color);"></i>
+              </div>
+              <div class="goal-amount">₹7,000/₹20,000</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar" style="width: 35%"></div>
+              </div>
+              <div class="goal-details">
+                <span>35% completed</span>
+                <span>₹13,000 remaining</span>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-header">
+                <div class="goal-title">New Laptop</div>
+                <i class="fas fa-laptop" style="color: var(--dark-gray);"></i>
+              </div>
+              <div class="goal-amount">₹15,000/₹60,000</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar" style="width: 25%"></div>
+              </div>
+              <div class="goal-details">
+                <span>25% completed</span>
+                <span>₹45,000 remaining</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Add Button (Same as dashboard) -->
+      <div class="quick-add">
+        <button class="add-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Budget & Savings page loaded');
+      
+      // Example of dynamic content loading
+      // fetch('/api/budget-data')
+      //   .then(response => response.json())
+      //   .then(data => {
+      //     // Update the UI with real data
+      //   });
+    });
+  </script>
+</body>
+</html>
