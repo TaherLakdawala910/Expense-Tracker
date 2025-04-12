@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro | Reports</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --accent-color: #60a5fa;
+      --text-color: #1f2937;
+      --light-gray: #f9fafb;
+      --medium-gray: #e5e7eb;
+      --dark-gray: #6b7280;
+      --error-color: #dc2626;
+      --success-color: #16a34a;
+      --warning-color: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+
+    /* Layout */
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: white;
+      border-right: 1px solid var(--medium-gray);
+      padding: 1.5rem 0;
+    }
+
+    .logo {
+      padding: 0 1.5rem 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.2rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.7rem 1.5rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .nav-link i {
+      margin-right: 0.8rem;
+      width: 20px;
+      text-align: center;
+      color: var(--dark-gray);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+    }
+
+    .nav-link:hover i, .nav-link.active i {
+      color: var(--primary-color);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+    }
+
+    .notification-btn {
+      background: none;
+      border: none;
+      margin-right: 1rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: var(--error-color);
+      color: white;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Reports Content */
+    .report-filters {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      background-color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .filter-select {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      background-color: white;
+    }
+
+    .export-btn {
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .export-btn i {
+      margin-right: 0.5rem;
+    }
+
+    .report-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .report-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .report-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.8rem;
+      color: var(--primary-color);
+    }
+
+    .report-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .report-desc {
+      font-size: 0.8rem;
+      color: var(--dark-gray);
+    }
+
+    .charts-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-card {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1.2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .chart-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .chart-period {
+      font-size: 0.8rem;
+      color: var(--dark-gray);
+    }
+
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+
+    .report-table-container {
+      background-color: white;
+      border-radius: 0.5rem;
+      padding: 1.2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .table-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .report-table th {
+      text-align: left;
+      padding: 0.5rem 0;
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .report-table td {
+      padding: 0.7rem 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 1rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+    }
+
+    .amount-income {
+      color: var(--success-color);
+      font-weight: 500;
+    }
+
+    .amount-expense {
+      color: var(--error-color);
+      font-weight: 500;
+    }
+
+    /* Quick Add */
+    .quick-add {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+    }
+
+    .add-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 1200px) {
+      .report-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .charts-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .sidebar {
+        display: none;
+      }
+      
+      .report-filters {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .filter-group {
+        flex-wrap: wrap;
+      }
+      
+      .report-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .quick-add {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        <span>ExpensePro</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="expense-tracking.html" class="nav-link">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transactions</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="income-management.html" class="nav-link">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Income</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="budget-savings.html" class="nav-link">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Budget</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reports.html" class="nav-link active">
+            <i class="fas fa-chart-bar"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="reminders.html" class="nav-link">
+            <i class="fas fa-bell"></i>
+            <span>Reminders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="shared-expenses.html" class="nav-link">
+            <i class="fas fa-users"></i>
+            <span>Shared</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="settings.html" class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1 class="page-title">Reports</h1>
+        <div class="user-menu">
+          <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          <div class="user-avatar">JS</div>
+        </div>
+      </div>
+
+      <!-- Report Filters -->
+      <div class="report-filters">
+        <div class="filter-group">
+          <select class="filter-select">
+            <option>Monthly Report</option>
+            <option>Annual Report</option>
+            <option>Category Report</option>
+            <option>Income vs Expense</option>
+          </select>
+          <select class="filter-select">
+            <option>April 2024</option>
+            <option>March 2024</option>
+            <option>February 2024</option>
+            <option>Custom Range</option>
+          </select>
+        </div>
+        <button class="export-btn">
+          <i class="fas fa-file-export"></i>
+          <span>Export Report</span>
+        </button>
+      </div>
+
+      <!-- Report Cards -->
+      <div class="report-cards">
+        <div class="report-card">
+          <div class="report-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3 class="report-title">Spending Trends</h3>
+          <p class="report-desc">View your spending patterns over time</p>
+        </div>
+        <div class="report-card">
+          <div class="report-icon">
+            <i class="fas fa-chart-pie"></i>
+          </div>
+          <h3 class="report-title">Category Breakdown</h3>
+          <p class="report-desc">See where your money is going</p>
+        </div>
+        <div class="report-card">
+          <div class="report-icon">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <h3 class="report-title">Income vs Expenses</h3>
+          <p class="report-desc">Compare your income and spending</p>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Monthly Spending</div>
+            <div class="chart-period">Jan 2024 - Apr 2024</div>
+          </div>
+          <div class="chart-container">
+            <!-- Chart would be rendered here with a library like Chart.js -->
+            <div style="display: flex; align-items: flex-end; height: 100%; gap: 10px; padding-top: 20px;">
+              <div style="flex: 1; background-color: var(--accent-color); height: 40%; border-radius: 4px;"></div>
+              <div style="flex: 1; background-color: var(--accent-color); height: 60%; border-radius: 4px;"></div>
+              <div style="flex: 1; background-color: var(--accent-color); height: 80%; border-radius: 4px;"></div>
+              <div style="flex: 1; background-color: var(--accent-color); height: 65%; border-radius: 4px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Spending by Category</div>
+            <div class="chart-period">April 2024</div>
+          </div>
+          <div class="chart-container">
+            <!-- Pie chart would be rendered here -->
+            <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(
+              var(--primary-color) 0% 25%, 
+              var(--success-color) 25% 45%, 
+              var(--accent-color) 45% 65%, 
+              #f59e0b 65% 80%, 
+              var(--error-color) 80% 100%
+            ); margin: 20px auto;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Transactions -->
+      <div class="report-table-container">
+        <div class="table-header">
+          <div class="table-title">Detailed Transactions</div>
+        </div>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Apr 15, 2024</td>
+              <td><span class="category-badge">Food & Dining</span></td>
+              <td>Dinner at Subway</td>
+              <td class="amount-expense">-₹500</td>
+              <td>Expense</td>
+            </tr>
+            <tr>
+              <td>Apr 14, 2024</td>
+              <td><span class="category-badge">Transportation</span></td>
+              <td>Petrol for scooter</td>
+              <td class="amount-expense">-₹350</td>
+              <td>Expense</td>
+            </tr>
+            <tr>
+              <td>Apr 12, 2024</td>
+              <td><span class="category-badge">Shopping</span></td>
+              <td>New headphones</td>
+              <td class="amount-expense">-₹1,250</td>
+              <td>Expense</td>
+            </tr>
+            <tr>
+              <td>Apr 10, 2024</td>
+              <td><span class="category-badge">Salary</span></td>
+              <td>Monthly paycheck</td>
+              <td class="amount-income">+₹25,000</td>
+              <td>Income</td>
+            </tr>
+            <tr>
+              <td>Apr 5, 2024</td>
+              <td><span class="category-badge">Housing</span></td>
+              <td>Electricity bill</td>
+              <td class="amount-expense">-₹800</td>
+              <td>Expense</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Quick Add Button -->
+      <div class="quick-add">
+        <button class="add-btn">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Reports page loaded');
+      
+      // Example of how you might handle report card clicks
+      document.querySelectorAll('.report-card').forEach(card => {
+        card.addEventListener('click', function() {
+          // This would load the specific report
+          console.log('Report card clicked:', this.querySelector('.report-title').textContent);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
